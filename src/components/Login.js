@@ -8,9 +8,13 @@ import { config } from "../App";
 import Footer from "./Footer";
 import Header from "./Header";
 import "./Login.css";
+import { BrowserRouter as Router} from "react-router-dom";
 
 const Login = () => {
   const { enqueueSnackbar } = useSnackbar();
+  const [formData, setformData] = useState({username: "", password:"" });
+  const [isLoading,setisLoading] = useState(false);
+  const history = useHistory();
 
   // TODO: CRIO_TASK_MODULE_LOGIN - Fetch the API response
   /**
@@ -38,6 +42,28 @@ const Login = () => {
    *
    */
   const login = async (formData) => {
+    setisLoading(true);
+     if(validateInput(formData)=== true){
+      try {
+        const response = await axios.post(`${config.endpoint}/auth/login`, {"username":formData.username,"password":formData.password});
+        console.log(response);
+        persistLogin(response.data.token, response.data.username, response.data.balance);
+        if(response) {
+        enqueueSnackbar("Logged in successfully" , {variant:"success"}) 
+        history.push("/");
+       }
+      }catch (err) {
+        console.log(err.response);
+        if(err.response.status>=400 && err.response.status<500) {
+           enqueueSnackbar(err.response.data.message , {variant:"error"});
+        }
+        else {
+  
+          enqueueSnackbar("Something went wrong. Check that the backend is running, reachable and returns valid JSON.", {variant:"error"})
+        }
+       }
+       setisLoading(false);
+    }
   };
 
   // TODO: CRIO_TASK_MODULE_LOGIN - Validate the input
@@ -56,6 +82,15 @@ const Login = () => {
    * -    Check that password field is not an empty value - "Password is a required field"
    */
   const validateInput = (data) => {
+    if(data.username.length === 0){
+      enqueueSnackbar("Username is a required field" , {variant:"warning"});
+      return false;
+     }
+     else if (data.password.length === 0){
+      enqueueSnackbar( "Password is a required field" , {variant:"warning"});
+      return false;
+     }
+     else {return true;}
   };
 
   // TODO: CRIO_TASK_MODULE_LOGIN - Persist user's login information
@@ -75,6 +110,9 @@ const Login = () => {
    * -    `balance` field in localStorage can be used to store the balance amount in the user's wallet
    */
   const persistLogin = (token, username, balance) => {
+    localStorage.setItem("token", token);
+    localStorage.setItem("username", username);
+    localStorage.setItem("balance", balance);
   };
 
   return (
@@ -85,8 +123,45 @@ const Login = () => {
       minHeight="100vh"
     >
       <Header hasHiddenAuthButtons />
+     
       <Box className="content">
         <Stack spacing={2} className="form">
+        <h2 className="title">Login</h2>
+        <TextField
+            id="username"
+            label="username"
+            variant="outlined"
+            title="Username"
+            name="username"
+            placeholder="Enter Username"
+            value = {formData.username}
+             onChange={(e) =>  setformData({ ...formData, "username": e.target.value })}
+            fullWidth
+          />
+
+          <TextField
+            id="password"
+            variant="outlined"
+            label="password"
+            name="password"
+            type="password"
+            value={formData.password}
+            onChange={(e) => setformData({ ...formData, "password": e.target.value })}
+            // helperText="Password must be atleast 6 characters length"
+            fullWidth
+            // placeholder="Enter a password with minimum 6 characters"
+          />
+          {isLoading?(<CircularProgress/>):
+                    
+          (<Button className="button"  onClick={() => login(formData)} variant="contained" >
+            LOGIN TO QKART
+           </Button>)}
+           <p className="secondary-action">
+            Don't have an account?{" "}
+            <Link className="link" to="/Register">
+              Register now
+             </Link>
+          </p>
         </Stack>
       </Box>
       <Footer />
