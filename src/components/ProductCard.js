@@ -12,8 +12,26 @@ import React from "react";
 import "./ProductCard.css";
 
 const ProductCard = ({ product, handleAddToCart }) => {
+
   return (
     <Card className="card">
+      <CardMedia
+        component="img"
+        image={product.image}
+        alt={product.name}
+      />
+      <CardContent>
+          <Typography color="black" variant="subtitle1">
+            {product.name}
+          </Typography>
+          <Typography color="black" fontWeight="bold" variant="h5">
+            ${product.cost}
+          </Typography>
+          <Rating name="half-rating-read" defaultValue={product.rating} precision={0.5} readOnly />
+        </CardContent>
+       <CardActions>
+        <Button startIcon={<AddShoppingCartOutlined />} onClick={() => handleAddToCart(product._id)} name="add to cart" role="button" variant="contained" fullWidth>ADD TO CART</Button>
+      </CardActions>
     </Card>
   );
 };
