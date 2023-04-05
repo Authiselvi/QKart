@@ -1,82 +1,74 @@
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { Avatar, Button, Stack } from "@mui/material";
+import { Search, SentimentDissatisfied } from "@mui/icons-material";
+import { Avatar, Button, Stack,
+  CircularProgress,
+  Grid,
+  InputAdornment,
+  TextField } from "@mui/material";
 import Box from "@mui/material/Box";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import {useHistory} from "react-router-dom";
 import "./Header.css";
-import { useHistory, Link } from "react-router-dom";
 
-const Header = ({ children, hasHiddenAuthButtons }) => {
-  const history = useHistory();
-  let user = localStorage.getItem("username");
+const Header = (props) =>
+  {
+    const history = useHistory();
+    const logout = () => {
+      localStorage.removeItem("username")
+      localStorage.removeItem("token")
+      localStorage.removeItem("balance")
+      history.push("/")
+      window.location.reload()
+    }
 
-  return (
-    <Box className="header">
-      <Box className="header-title">
-        {" "}
-        <img src="logo_light.svg" alt="QKart-icon"></img>{" "}
-      </Box>{" "}
-      {/* <div> {children} </div> */}{" "}
-      {hasHiddenAuthButtons ? (
-        <Button
-          className="explore-button"
-          startIcon={<ArrowBackIcon />}
-          variant="text"
-          onClick={() => history.push("/")}
+    const username = localStorage.getItem("username")
+
+    let searchBox = <Box></Box>
+    
+    if (!props.hasHiddenAuthButtons){
+      searchBox = props.searchBox
+    }
+
+    let headerButton = <Button></Button>;
+
+    if (props.hasHiddenAuthButtons){
+      headerButton = <Button onClick={()=>{history.push("/", {})}}
+        name="back to explore"
+        startIcon={<ArrowBackIcon />}
+        variant="text"
         >
-          {" "}
-          Back to explore{" "}
-        </Button>
-      ) : (
-        <div>
-          {" "}
-          {user !== null ? (
-            <Stack direction="row">
-              {" "}
-              <img src="avatar.png" alt={user} /> <h5>{user}</h5>{" "}
-              <Button
-                name="logout"
-                onClick={() => {
-                  localStorage.clear();
-                  history.push("/");
-                  window.location.reload();
-                }}
-              >
-                {" "}
-                Logout{" "}
-              </Button>{" "}
-            </Stack>
-          ) : (
-            <Stack direction="row">
-              {" "}
-              <Button onClick={() => history.push("/login")}>Login</Button>{" "}
-              <Button
-                onClick={() => history.push("/register")}
-                variant="contained"
-              >
-                {" "}
-                Register{" "}
-              </Button>{" "}
-            </Stack>
-          )}{" "}
-        </div>
-      )}{" "}
-    </Box>
+        Back to explore
+      </Button>
+    }
+    else if (username){
+      headerButton = <Stack direction="row" spacing={1} alignItems="center">
+        <Avatar alt={username} src="avatar.png" />
+        <p>{username}</p>
+        {/* <p>{username.charAt(0).toUpperCase() + username.slice(1)}</p> */}
+        <Button onClick={logout} variant="text">LOGOUT</Button>
+      </Stack>
+    }
+    else {
+      headerButton = <Stack direction="row" spacing={1} alignItems="center">
+        <Button onClick={()=>{history.push("/login", {})}}  variant="text">LOGIN</Button>
+        <Button onClick={()=>{history.push("/register", {})}} variant="contained">REGISTER</Button>
+      </Stack>
+    }
 
-    // <Box className="header">
-    //   <Box className="header-title">
-    //       <img src="logo_light.svg" alt="QKart-icon"></img>
-    //   </Box>
-    //   <Link className="link" to="/">
-    //   <Button
-    //     className="explore-button"
-    //     startIcon={<ArrowBackIcon />}
-    //     variant="text"
-    //   >
-    //     Back to explore
-    //   </Button>
-    //   </Link>
-    // </Box>
-  );
-};
+   
+
+    return (
+      <Box className="header">
+        <Box
+          className="header-title"
+        >
+          {/* FIXME - Skip svg in stub generator */}
+          <img src="logo_light.svg" alt="QKart-icon"></img>
+        </Box>
+        {searchBox}
+        {headerButton}
+      </Box>
+    );
+  };
 
 export default Header;
