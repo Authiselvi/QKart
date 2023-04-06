@@ -355,8 +355,7 @@ const Products = () => {
                     <Box className="hero">
                         <p className="hero-heading">
                             India's <span className="hero-highlight">FASTEST DELIVERY</span>{" "}
-                            to your door step
-                        </p>
+                            to your door step</p>
                     </Box>
 
                 </Grid>
@@ -372,3 +371,4 @@ const Products = () => {
 };
 
 export default Products;
+
