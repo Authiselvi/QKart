@@ -190,7 +190,7 @@ export const displayCartItem = (cartItem, handleQuantity, isReadOnly) => {
  *    If product quantity on cart is to be displayed as read only without the + - options to change quantity
  * 
  */
-const Cart = ({
+const Cart = ({isReadOnly,
   products,
   items = [],
   handleQuantity,
